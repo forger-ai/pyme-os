@@ -183,6 +183,36 @@ Rule: if an improvement is reusable by multiple apps in the stack, propose movin
 
 The agent must not patch constants by editing Python code; constants live in JSON.
 
+### MCP Tools
+
+PymeOS declares an HTTP MCP server in `manifest.json`. The server runs from
+`backend/` with `python -m app.mcp_server` and exposes `/health` plus MCP
+JSON-RPC tools.
+
+The MCP tools are internal agent tools for structured app data access. They
+are not user-visible commands and must not be presented as steps the final user
+needs to run.
+
+Available MCP operations:
+
+- list, create, and inspect employees
+- list and create contracts for an employee
+- list and create vacation ledger entries
+- read the current naive vacation balance
+- list and create payroll periods when constants exist for the selected year
+- list stored payslips
+- report that payroll calculation and Previred export are not implemented in
+  this version
+
+Rules:
+
+- validate input through the existing backend models where those models exist
+- return structured errors instead of mutating data with partial assumptions
+- do not calculate payroll amounts through MCP until the payroll engine exists
+- do not generate a Previred file through MCP until the export writer exists
+- use `PAYROLL_CONSTANTS_DIR` for constants lookup; do not hardcode legal
+  values in MCP tools
+
 ### Local Backend
 
 Typical internal commands:
