@@ -102,5 +102,17 @@
       "depends_on": ["backend"]
     }
   ],
+  "mcp": {
+    "type": "http",
+    "context": "./backend",
+    "command": "python -m app.mcp_server",
+    "healthcheck": "/health",
+    "environment": {
+      "DATABASE_URL": "sqlite:////app/data/pyme_os.sqlite",
+      "PAYROLL_CONSTANTS_DIR": "./config/cl",
+      "PYTHONPATH": "./src"
+    },
+    "toolTimeoutSec": 600
+  },
   "skills": []
 }
