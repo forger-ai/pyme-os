@@ -1,0 +1,106 @@
+{
+  "name": "pyme-os",
+  "version": "0.1.0",
+  "description": "Local-first payroll and HR app for Chilean SMBs (Pymes). FastAPI backend, Vite + React frontend, SQLite storage.",
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "summary": "Initial scaffolding with employees, vacations, payslips, and Previred export structure.",
+      "changes": [
+        "Defines domain models for employees, contracts, vacation ledger, payroll periods, and payslips.",
+        "Exposes empty REST endpoints under /api/employees, /api/payslips, /api/vacations, /api/previred.",
+        "Loads Chilean payroll constants from external versioned JSON files under backend/config/cl/.",
+        "Provides a four-tab frontend shell wired to the backend health and domain endpoints."
+      ]
+    }
+  ],
+  "author": "Forger AI",
+  "license": "MIT",
+  "stack": {
+    "backend": {
+      "language": "python",
+      "framework": "fastapi",
+      "package_manager": "uv",
+      "database": "sqlite",
+      "python_version": "3.12"
+    },
+    "frontend": {
+      "language": "typescript",
+      "framework": "react",
+      "bundler": "vite",
+      "ui": "mui",
+      "node_version": "24"
+    }
+  },
+  "catalog": {
+    "display_name": "PymeOS",
+    "short_description": "Sueldos, vacaciones y planilla Previred para Pymes chilenas. Tus datos en tu equipo.",
+    "description": "PymeOS es una app local para Pymes chilenas que cubre lo esencial de remuneraciones: ficha de empleados con contratos, calculo de liquidaciones de sueldo (bruto a liquido con AFP, salud, seguro de cesantia e impuesto unico), saldo de vacaciones legales y proporcionales, y generacion de la planilla mensual para Previred. Los parametros legales (UF, tope imponible, tramos de impuesto, sueldo minimo, tasas AFP) se cargan desde archivos versionados externos por anio.",
+    "category": "business",
+    "capabilities": [
+      {
+        "id": "employees_and_contracts",
+        "title": "Administrar empleados y contratos",
+        "description": "Mantiene ficha de cada trabajador con datos personales, contrato vigente, anexos y estado activo o finiquitado."
+      },
+      {
+        "id": "payroll_calculation",
+        "title": "Calcular liquidaciones de sueldo",
+        "description": "Calcula liquidaciones mensuales desde sueldo bruto a liquido aplicando AFP, salud, seguro de cesantia e impuesto unico de segunda categoria segun parametros legales chilenos versionados."
+      },
+      {
+        "id": "vacation_tracking",
+        "title": "Llevar saldo de vacaciones",
+        "description": "Registra vacaciones devengadas, usadas y proporcionales para cada empleado, con regla de prescripcion y feriado progresivo."
+      },
+      {
+        "id": "previred_export",
+        "title": "Generar planilla Previred",
+        "description": "Produce el archivo mensual de cotizaciones previsionales en formato compatible con Previred para que el usuario lo suba manualmente."
+      }
+    ],
+    "supported_platforms": [
+      "darwin_arm64",
+      "darwin_x64"
+    ],
+    "release": {
+      "repository": "forger-ai/pyme-os",
+      "tag_template": "{name}/v{version}",
+      "asset_name_template": "{name}-{version}.zip",
+      "catalog_repository": "forger-ai/apps-catalog",
+      "catalog_manifest_path": "vite-fastapi-sqlite/pyme-os/manifest.json"
+    }
+  },
+  "services": [
+    {
+      "name": "backend",
+      "type": "http",
+      "context": "./backend",
+      "port": 8000,
+      "command": "uv run fastapi dev src/app/main.py --host 0.0.0.0 --port 8000",
+      "healthcheck": "/api/health",
+      "environment": {
+        "DATABASE_URL": "sqlite:////app/data/pyme_os.sqlite",
+        "CORS_ORIGINS": "http://localhost:5181,http://127.0.0.1:5181",
+        "PAYROLL_CONSTANTS_DIR": "/app/config/cl"
+      },
+      "volumes": [
+        { "source": "./backend", "target": "/app" },
+        { "source": "./backend/data", "target": "/app/data", "persist": true },
+        { "source": "./backend/config", "target": "/app/config" }
+      ]
+    },
+    {
+      "name": "frontend",
+      "type": "http",
+      "context": "./frontend",
+      "port": 5181,
+      "command": "npm run dev -- --host 0.0.0.0 --port 5181",
+      "environment": {
+        "VITE_API_BASE_URL": "http://localhost:8000"
+      },
+      "depends_on": ["backend"]
+    }
+  ],
+  "skills": []
+}

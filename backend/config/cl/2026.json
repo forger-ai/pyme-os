@@ -1,0 +1,49 @@
+{
+  "_meta": {
+    "year": 2026,
+    "updated_at": "2026-04-28",
+    "source": "Initial scaffolding values. Sueldo minimo and tax brackets reference Chilean 2025 publications carried forward as a placeholder. Verify against official 2026 sources before issuing real payslips.",
+    "verified": false,
+    "notes": "AFP total_rate aggregates the 10% mandatory contribution and an estimated AFP commission for 2025. UF and UTM monthly snapshots are not stored here; they must be supplied per period when calculations are wired up."
+  },
+  "currency": "CLP",
+  "minimum_wage_clp": 510000,
+  "imponible_caps": {
+    "afp_health_uf": 87.8,
+    "unemployment_insurance_uf": 131.7
+  },
+  "afp": [
+    { "code": "modelo",    "name": "AFP Modelo",    "total_rate": 0.1058 },
+    { "code": "uno",       "name": "AFP Uno",       "total_rate": 0.1049 },
+    { "code": "planvital", "name": "AFP PlanVital", "total_rate": 0.1116 },
+    { "code": "habitat",   "name": "AFP Habitat",   "total_rate": 0.1127 },
+    { "code": "capital",   "name": "AFP Capital",   "total_rate": 0.1144 },
+    { "code": "cuprum",    "name": "AFP Cuprum",    "total_rate": 0.1144 },
+    { "code": "provida",   "name": "AFP Provida",   "total_rate": 0.1145 }
+  ],
+  "health": {
+    "fonasa_rate": 0.07,
+    "isapre_minimum_rate": 0.07
+  },
+  "unemployment_insurance": {
+    "indefinite": { "employee": 0.006, "employer": 0.024 },
+    "fixed_term": { "employee": 0.0,   "employer": 0.030 }
+  },
+  "income_tax_brackets_utm": [
+    { "from": 0,    "to": 13.5, "rate": 0.0,   "deduction_utm": 0.0 },
+    { "from": 13.5, "to": 30,   "rate": 0.04,  "deduction_utm": 0.54 },
+    { "from": 30,   "to": 50,   "rate": 0.08,  "deduction_utm": 1.74 },
+    { "from": 50,   "to": 70,   "rate": 0.135, "deduction_utm": 4.49 },
+    { "from": 70,   "to": 90,   "rate": 0.23,  "deduction_utm": 11.14 },
+    { "from": 90,   "to": 120,  "rate": 0.304, "deduction_utm": 17.80 },
+    { "from": 120,  "to": 310,  "rate": 0.35,  "deduction_utm": 23.32 },
+    { "from": 310,  "to": null, "rate": 0.40,  "deduction_utm": 38.82 }
+  ],
+  "uf_default": null,
+  "utm_default": null,
+  "vacation": {
+    "annual_business_days": 15,
+    "progressive_threshold_years": 10,
+    "progressive_extra_per_three_years": 1
+  }
+}
