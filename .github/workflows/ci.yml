@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Backend verify
+        run: |
+          docker compose run --rm backend uv run --extra dev ruff check src/app/mcp_runtime.py src/app/mcp_server.py
+          docker compose run --rm backend uv run python -m py_compile src/app/mcp_runtime.py src/app/mcp_server.py
+
+      - name: Frontend build
+        run: docker compose run --rm --no-deps frontend npm run build
+
+      - name: Cleanup app services
+        if: always()
+        run: docker compose down --remove-orphans
