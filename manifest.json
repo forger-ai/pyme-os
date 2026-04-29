@@ -1,8 +1,15 @@
 {
   "name": "pyme-os",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local-first payroll and HR app for Chilean SMBs (Pymes). FastAPI backend, Vite + React frontend, SQLite storage.",
   "changelog": [
+    {
+      "version": "0.1.1",
+      "summary": "Marks the app as beta in Forger catalog surfaces.",
+      "changes": [
+        "Adds beta metadata so Forger can label the app in catalog and installed-app cards."
+      ]
+    },
     {
       "version": "0.1.0",
       "summary": "Initial scaffolding with employees, vacations, payslips, and Previred export structure.",
@@ -69,7 +76,8 @@
       "asset_name_template": "{name}-{version}.zip",
       "catalog_repository": "forger-ai/apps-catalog",
       "catalog_manifest_path": "vite-fastapi-sqlite/pyme-os/manifest.json"
-    }
+    },
+    "beta": true
   },
   "services": [
     {
@@ -80,14 +88,24 @@
       "command": "uv run fastapi dev src/app/main.py --host 0.0.0.0 --port 8000",
       "healthcheck": "/api/health",
       "environment": {
-        "DATABASE_URL": "sqlite:////app/data/pyme_os.sqlite",
+        "DATABASE_URL": "sqlite:///{app_data}/pyme_os.sqlite",
         "CORS_ORIGINS": "http://localhost:5181,http://127.0.0.1:5181",
         "PAYROLL_CONSTANTS_DIR": "/app/config/cl"
       },
       "volumes": [
-        { "source": "./backend", "target": "/app" },
-        { "source": "./backend/data", "target": "/app/data", "persist": true },
-        { "source": "./backend/config", "target": "/app/config" }
+        {
+          "source": "./backend",
+          "target": "/app"
+        },
+        {
+          "source": "./backend/data",
+          "target": "/app/data",
+          "persist": true
+        },
+        {
+          "source": "./backend/config",
+          "target": "/app/config"
+        }
       ]
     },
     {
@@ -99,7 +117,9 @@
       "environment": {
         "VITE_API_BASE_URL": "http://localhost:8000"
       },
-      "depends_on": ["backend"]
+      "depends_on": [
+        "backend"
+      ]
     }
   ],
   "mcp": {
@@ -108,7 +128,7 @@
     "command": "python -m app.mcp_server",
     "healthcheck": "/health",
     "environment": {
-      "DATABASE_URL": "sqlite:////app/data/pyme_os.sqlite",
+      "DATABASE_URL": "sqlite:///{app_data}/pyme_os.sqlite",
       "PAYROLL_CONSTANTS_DIR": "./config/cl",
       "PYTHONPATH": "./src"
     },
