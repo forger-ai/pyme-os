@@ -23,6 +23,7 @@ dist/
 .env
 .env.*
 !.env.example
+.version.dev
 
 # OS
 .DS_Store
