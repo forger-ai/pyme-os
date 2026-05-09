@@ -1,29 +1,40 @@
 {
   "_meta": {
     "year": 2026,
-    "updated_at": "2026-04-28",
-    "source": "Initial scaffolding values. Sueldo minimo and tax brackets reference Chilean 2025 publications carried forward as a placeholder. Verify against official 2026 sources before issuing real payslips.",
-    "verified": false,
-    "notes": "AFP total_rate aggregates the 10% mandatory contribution and an estimated AFP commission for 2025. UF and UTM monthly snapshots are not stored here; they must be supplied per period when calculations are wired up."
+    "updated_at": "2026-05-05",
+    "source": "Valores oficiales 2026: sueldo minimo (Ley 21.751, vigente desde enero 2026), topes imponibles (Superintendencia de Pensiones, vigentes desde febrero 2026), comisiones AFP (queAFP / Superintendencia, vigentes a febrero 2026), SIS (vigente desde abril 2026), UF y UTM (snapshots mayo 2026, cambian todos los meses).",
+    "verified": true,
+    "notes": "UF y UTM cambian mensualmente. Para precision al peso se debe pasar el snapshot exacto del periodo en cada calculo. Los defaults aqui son referenciales."
   },
   "currency": "CLP",
-  "minimum_wage_clp": 510000,
+  "minimum_wage_clp": 539000,
   "imponible_caps": {
-    "afp_health_uf": 87.8,
-    "unemployment_insurance_uf": 131.7
+    "afp_health_uf": 90.0,
+    "unemployment_insurance_uf": 135.2
   },
   "afp": [
-    { "code": "modelo",    "name": "AFP Modelo",    "total_rate": 0.1058 },
-    { "code": "uno",       "name": "AFP Uno",       "total_rate": 0.1049 },
-    { "code": "planvital", "name": "AFP PlanVital", "total_rate": 0.1116 },
-    { "code": "habitat",   "name": "AFP Habitat",   "total_rate": 0.1127 },
-    { "code": "capital",   "name": "AFP Capital",   "total_rate": 0.1144 },
-    { "code": "cuprum",    "name": "AFP Cuprum",    "total_rate": 0.1144 },
-    { "code": "provida",   "name": "AFP Provida",   "total_rate": 0.1145 }
+    { "code": "uno",       "name": "AFP Uno",       "total_rate": 0.1046, "previred_code": "35" },
+    { "code": "modelo",    "name": "AFP Modelo",    "total_rate": 0.1058, "previred_code": "34" },
+    { "code": "planvital", "name": "AFP PlanVital", "total_rate": 0.1116, "previred_code": "11" },
+    { "code": "habitat",   "name": "AFP Habitat",   "total_rate": 0.1127, "previred_code": "05" },
+    { "code": "capital",   "name": "AFP Capital",   "total_rate": 0.1144, "previred_code": "33" },
+    { "code": "cuprum",    "name": "AFP Cuprum",    "total_rate": 0.1144, "previred_code": "03" },
+    { "code": "provida",   "name": "AFP Provida",   "total_rate": 0.1145, "previred_code": "08" }
   ],
   "health": {
     "fonasa_rate": 0.07,
-    "isapre_minimum_rate": 0.07
+    "isapre_minimum_rate": 0.07,
+    "providers": [
+      { "code": "fonasa",        "name": "Fonasa",                "kind": "fonasa", "previred_code": "07" },
+      { "code": "banmedica",     "name": "Banmédica",             "kind": "isapre", "previred_code": "01" },
+      { "code": "colmena",       "name": "Colmena Golden Cross",  "kind": "isapre", "previred_code": "03" },
+      { "code": "cruzblanca",    "name": "Cruz Blanca",           "kind": "isapre", "previred_code": "02" },
+      { "code": "nueva_masvida", "name": "Nueva Masvida",         "kind": "isapre", "previred_code": "12" },
+      { "code": "vidatres",      "name": "Vida Tres",             "kind": "isapre", "previred_code": "10" },
+      { "code": "consalud",      "name": "Consalud",              "kind": "isapre", "previred_code": "04" },
+      { "code": "esencial",      "name": "Esencial",              "kind": "isapre", "previred_code": "37" },
+      { "code": "cruzdelnorte",  "name": "Cruz del Norte",        "kind": "isapre", "previred_code": "25" }
+    ]
   },
   "unemployment_insurance": {
     "indefinite": { "employee": 0.006, "employer": 0.024 },
@@ -39,8 +50,33 @@
     { "from": 120,  "to": 310,  "rate": 0.35,  "deduction_utm": 23.32 },
     { "from": 310,  "to": null, "rate": 0.40,  "deduction_utm": 38.82 }
   ],
-  "uf_default": null,
-  "utm_default": null,
+  "uf_default": 40146.82,
+  "utm_default": 70588,
+  "mutual": {
+    "providers": [
+      { "code": "isl",     "name": "ISL (Instituto Seguridad Laboral)", "previred_code": "00" },
+      { "code": "achs",    "name": "ACHS",                              "previred_code": "01" },
+      { "code": "mutual",  "name": "Mutual de Seguridad CChC",          "previred_code": "02" },
+      { "code": "ist",     "name": "IST (Instituto Seguridad Trabajo)", "previred_code": "03" }
+    ],
+    "default_code": "achs"
+  },
+  "caja_compensacion": {
+    "providers": [
+      { "code": "ninguna",        "name": "Sin caja",                       "previred_code": "00" },
+      { "code": "los_andes",      "name": "Caja Los Andes",                 "previred_code": "01" },
+      { "code": "la_araucana",    "name": "Caja La Araucana",               "previred_code": "02" },
+      { "code": "los_heroes",     "name": "Caja Los Héroes",                "previred_code": "03" },
+      { "code": "18_septiembre",  "name": "Caja 18 de Septiembre",          "previred_code": "04" }
+    ],
+    "default_code": "ninguna"
+  },
+  "employer_extras": {
+    "sis": 0.0162,
+    "mutual_base": 0.0093,
+    "ley_sanna": 0.003,
+    "reforma_previsional": 0.01
+  },
   "vacation": {
     "annual_business_days": 15,
     "progressive_threshold_years": 10,

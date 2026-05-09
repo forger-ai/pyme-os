@@ -11,15 +11,17 @@ import {
   Typography,
 } from "@mui/material";
 import { get } from "./api/client";
-import EmpleadosPage from "./pages/Empleados";
-import LiquidacionesPage from "./pages/Liquidaciones";
-import VacacionesPage from "./pages/Vacaciones";
+import EmpleadosPage from "./pages/empleados/EmpleadosPage";
+import Organigrama from "./pages/organigrama/Organigrama";
+import LiquidacionesPage from "./pages/liquidaciones/LiquidacionesPage";
+import VacacionesPage from "./pages/vacaciones/VacacionesPage";
 import PreviredPage from "./pages/Previred";
 
 type HealthStatus = "loading" | "ok" | "error";
 
 const TABS = [
   { id: "empleados", label: "Empleados" },
+  { id: "organigrama", label: "Organigrama" },
   { id: "liquidaciones", label: "Liquidaciones" },
   { id: "vacaciones", label: "Vacaciones" },
   { id: "previred", label: "Previred" },
@@ -73,6 +75,7 @@ export default function App() {
 
       <Container maxWidth="lg" sx={{ flexGrow: 1, py: 3 }}>
         {tab === "empleados" && <EmpleadosPage />}
+        {tab === "organigrama" && <Organigrama />}
         {tab === "liquidaciones" && <LiquidacionesPage />}
         {tab === "vacaciones" && <VacacionesPage />}
         {tab === "previred" && <PreviredPage />}
