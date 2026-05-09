@@ -1,8 +1,16 @@
 {
   "name": "pyme-os",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local-first payroll and HR app for Chilean SMBs (Pymes). FastAPI backend, Vite + React frontend, SQLite storage.",
   "changelog": [
+    {
+      "version": "0.1.2",
+      "summary": "Adds employee, org chart, payroll, vacation, and app icon updates.",
+      "changes": [
+        "Expands the employee, organization chart, payroll, and vacation modules.",
+        "Adds a PymeOS catalog icon for Forger catalog and installed-app surfaces."
+      ]
+    },
     {
       "version": "0.1.1",
       "summary": "Marks the app as beta in Forger catalog surfaces.",
@@ -41,6 +49,7 @@
   },
   "catalog": {
     "display_name": "PymeOS",
+    "icon_path": "assets/icon.png",
     "short_description": "Sueldos, vacaciones y planilla Previred para Pymes chilenas. Tus datos en tu equipo.",
     "description": "PymeOS es una app local para Pymes chilenas que cubre lo esencial de remuneraciones: ficha de empleados con contratos, calculo de liquidaciones de sueldo (bruto a liquido con AFP, salud, seguro de cesantia e impuesto unico), saldo de vacaciones legales y proporcionales, y generacion de la planilla mensual para Previred. Los parametros legales (UF, tope imponible, tramos de impuesto, sueldo minimo, tasas AFP) se cargan desde archivos versionados externos por anio.",
     "category": "business",
