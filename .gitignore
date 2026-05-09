@@ -33,3 +33,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Local SQLite dev database (recreate via scripts/seed_employees.py)
+backend/data/*.sqlite
+backend/data/*.sqlite-journal
