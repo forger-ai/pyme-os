@@ -52,7 +52,7 @@
     "icon_path": "assets/icon.png",
     "short_description": "Sueldos, vacaciones y planilla Previred para Pymes chilenas. Tus datos en tu equipo.",
     "description": "PymeOS es una app local para Pymes chilenas que cubre lo esencial de remuneraciones: ficha de empleados con contratos, calculo de liquidaciones de sueldo (bruto a liquido con AFP, salud, seguro de cesantia e impuesto unico), saldo de vacaciones legales y proporcionales, y generacion de la planilla mensual para Previred. Los parametros legales (UF, tope imponible, tramos de impuesto, sueldo minimo, tasas AFP) se cargan desde archivos versionados externos por anio.",
-    "category": "business",
+    "category": "finance",
     "capabilities": [
       {
         "id": "employees_and_contracts",
