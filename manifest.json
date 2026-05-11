@@ -97,7 +97,7 @@
       "environment": {
         "DATABASE_URL": "sqlite:///{app_data}/pyme_os.sqlite",
         "CORS_ORIGINS": "http://localhost:5181,http://127.0.0.1:5181",
-        "PAYROLL_CONSTANTS_DIR": "/app/config/cl"
+        "PAYROLL_CONSTANTS_DIR": "{backend}/config/cl"
       },
       "volumes": [
         {
@@ -136,8 +136,8 @@
     "healthcheck": "/health",
     "environment": {
       "DATABASE_URL": "sqlite:///{app_data}/pyme_os.sqlite",
-      "PAYROLL_CONSTANTS_DIR": "./config/cl",
-      "PYTHONPATH": "./src"
+      "PAYROLL_CONSTANTS_DIR": "{backend}/config/cl",
+      "PYTHONPATH": "{backend}/src"
     },
     "toolTimeoutSec": 600
   },
