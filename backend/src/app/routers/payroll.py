@@ -40,6 +40,13 @@ from app.payroll_engine import (
     solve_for_anchor,
 )
 from app.routers.settings import resolve_mutual_additional_rate
+from app.services.rates import (
+    RateFetchError,
+    SUPPORTED_CODES,
+    get_cached_snapshot,
+    get_current_value,
+    refresh_rates,
+)
 
 router = APIRouter()
 
@@ -95,16 +102,81 @@ def catalogs(year: Optional[int] = None) -> PayrollCatalogs:
     if not constants.get("_meta", {}).get("verified", False):
         notes.append("Constantes legales sin verificar oficialmente.")
 
+    # Prefer the cached UF/UTM snapshot (refreshed from mindicador.cl) so
+    # the wizard and any consumer reads the user's live value, with the
+    # JSON defaults as a last-resort fallback.
+    uf_live = float(get_current_value("uf", selected_year))
+    utm_live = float(get_current_value("utm", selected_year))
     return PayrollCatalogs(
         year=selected_year,
         verified=bool(constants.get("_meta", {}).get("verified", False)),
         minimum_wage_clp=float(constants.get("minimum_wage_clp", 0)),
-        # Defaults for UF/UTM when the JSON doesn't store them.
-        uf_default_clp=float(constants.get("uf_default") or 40146.82),
-        utm_default_clp=float(constants.get("utm_default") or 70588.0),
+        uf_default_clp=uf_live or float(constants.get("uf_default") or 40146.82),
+        utm_default_clp=utm_live or float(constants.get("utm_default") or 70588.0),
         afp_options=afps,
         health_options=health_options,
         notes=notes,
+    )
+
+
+class RateSnapshotDTO(BaseModel):
+    code: str
+    value_clp: float
+    snapshot_date: str
+    source: str
+    fetched_at: Optional[str] = None
+    stale: bool = False
+
+
+class CurrentRatesResponse(BaseModel):
+    uf: Optional[RateSnapshotDTO] = None
+    utm: Optional[RateSnapshotDTO] = None
+
+
+class RefreshRatesResponse(BaseModel):
+    uf: RateSnapshotDTO
+    utm: RateSnapshotDTO
+
+
+def _snapshot_to_dto(code: str, year: Optional[int] = None) -> RateSnapshotDTO:
+    cached = get_cached_snapshot(code)
+    if cached is not None:
+        return RateSnapshotDTO(
+            code=cached.code,
+            value_clp=float(cached.value_clp),
+            snapshot_date=cached.snapshot_date.isoformat(),
+            source=cached.source,
+            fetched_at=cached.fetched_at.isoformat(),
+            stale=False,
+        )
+    fallback = float(get_current_value(code, year))
+    return RateSnapshotDTO(
+        code=code,
+        value_clp=fallback,
+        snapshot_date=datetime.now(timezone.utc).date().isoformat(),
+        source="default (constants_cl)",
+        fetched_at=None,
+        stale=True,
+    )
+
+
+@router.get("/rates", response_model=CurrentRatesResponse)
+def get_rates() -> CurrentRatesResponse:
+    return CurrentRatesResponse(
+        uf=_snapshot_to_dto("uf"),
+        utm=_snapshot_to_dto("utm"),
+    )
+
+
+@router.post("/rates/refresh", response_model=RefreshRatesResponse)
+async def refresh_indicator_rates() -> RefreshRatesResponse:
+    try:
+        await refresh_rates(SUPPORTED_CODES)
+    except RateFetchError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return RefreshRatesResponse(
+        uf=_snapshot_to_dto("uf"),
+        utm=_snapshot_to_dto("utm"),
     )
 
 
@@ -381,8 +453,11 @@ def _build_inputs_from_contract(
         "health_provider": health if health in ("fonasa", "isapre") else "fonasa",
         "isapre_plan_uf": 0.0,
         "year": period_year,
-        "uf_value_clp": 40146.82,
-        "utm_value_clp": 70588.0,
+        # Snapshot UF/UTM at generation time. Use the cached indicator value
+        # (refreshed from mindicador.cl) when available, otherwise the JSON
+        # default; either way the payslip stores the exact value used.
+        "uf_value_clp": float(get_current_value("uf", period_year)),
+        "utm_value_clp": float(get_current_value("utm", period_year)),
         "days_worked": days,
         "include_gratification": True,
         "non_imponible_items": items_raw,

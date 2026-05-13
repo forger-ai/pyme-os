@@ -43,6 +43,7 @@ from app.payroll_engine import (
     compute_from_base,
 )
 from app.routers.settings import resolve_mutual_additional_rate
+from app.services.rates import get_current_rates
 
 router = APIRouter()
 
@@ -752,6 +753,7 @@ def _compute_employer_cost(
         for it in non_imponibles_raw
         if it.get("label") and float(it.get("amount_clp") or 0) > 0
     )
+    uf_value, utm_value = get_current_rates()
     payroll_input = PayrollInput(
         base_salary_clp=base,
         contract_type=contract.contract_type.value,
@@ -760,6 +762,8 @@ def _compute_employer_cost(
         isapre_plan_uf=plan_uf,
         non_imponible_items=items,
         mutual_additional_rate=resolve_mutual_additional_rate(),
+        uf_value_clp=float(uf_value),
+        utm_value_clp=float(utm_value),
     )
     breakdown = compute_from_base(payroll_input)
     return EmployerCostBreakdown(

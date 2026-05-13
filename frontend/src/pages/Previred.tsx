@@ -17,6 +17,7 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import { API_BASE_URL, ApiError, get } from "../api/client";
 import CompanySettingsPanel from "./previred/CompanySettingsPanel";
+import IndicatorRatesPanel from "./previred/IndicatorRatesPanel";
 
 type ClosedPeriod = {
   id: string;
@@ -58,6 +59,7 @@ export default function PreviredPage() {
       </Box>
 
       <CompanySettingsPanel />
+      <IndicatorRatesPanel />
 
       {error && <Alert severity="error">{error}</Alert>}
       {periods === null && !error && (
