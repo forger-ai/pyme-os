@@ -36,6 +36,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/CloseOutlined";
 import { ApiError, get, request } from "../../api/client";
+import Spotlight from "./Spotlight";
 
 type EmployeesPage = { items: unknown[]; total: number };
 type OnboardingState = { completed: boolean; completed_at: string | null };
@@ -122,6 +123,10 @@ export default function OnboardingTour({ onRequestTab }: Props) {
         onSkip={skip}
       />
 
+      {step === "first_employee" && (
+        <Spotlight targetSelector='[data-tour-id="empleados-nuevo"]' />
+      )}
+
       <FloatingCard
         visible={step === "first_employee"}
         title="Paso 1 de 2 · Crea tu primer colaborador"
@@ -129,9 +134,9 @@ export default function OnboardingTour({ onRequestTab }: Props) {
         onSkip={skip}
       >
         <Typography variant="body2">
-          En la pestaña <strong>Empleados</strong>, haz clic en{" "}
-          <strong>Nuevo</strong> para registrar al primer colaborador. Necesitarás
-          al menos su nombre, RUT y sueldo base.
+          Hacé clic en el botón resaltado <strong>Nuevo colaborador</strong>{" "}
+          para abrir el formulario. Necesitas al menos su nombre, RUT y
+          sueldo base.
         </Typography>
         <Typography variant="caption" color="text.secondary">
           Detecto automáticamente cuando lo crees y avanzo al siguiente paso.
@@ -267,7 +272,12 @@ function FloatingCard({
         right: 20,
         width: 360,
         maxWidth: "calc(100vw - 40px)",
-        zIndex: (theme) => theme.zIndex.modal,
+        // Below MUI's Drawer (1200) so that when the user opens the new
+        // collaborator form from inside the spotlight, the form drawer
+        // covers both the dim layer and this card. Once the drawer
+        // closes the tour reappears (and usually auto-advances 2s later
+        // once the employee creation is detected).
+        zIndex: 1150,
         overflow: "hidden",
       }}
     >
