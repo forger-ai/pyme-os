@@ -8,6 +8,7 @@ from app.routers.employees import router as employees_router
 from app.routers.payroll import router as payroll_router
 from app.routers.payslips import router as payslips_router
 from app.routers.previred import router as previred_router
+from app.routers.settings import router as settings_router
 from app.routers.vacations import router as vacations_router
 
 app = FastAPI(
@@ -32,6 +33,7 @@ app.include_router(payroll_router, prefix="/api/payroll", tags=["payroll"])
 app.include_router(payslips_router, prefix="/api/payslips", tags=["payslips"])
 app.include_router(vacations_router, prefix="/api/vacations", tags=["vacations"])
 app.include_router(previred_router, prefix="/api/previred", tags=["previred"])
+app.include_router(settings_router, prefix="/api/settings", tags=["settings"])
 
 
 @app.on_event("startup")

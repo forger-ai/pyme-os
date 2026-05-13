@@ -59,6 +59,7 @@ export type EmployerCostBreakdown = {
   non_imponible_total_clp: number;
   sis_clp: number;
   mutual_clp: number;
+  mutual_rate: number;
   afc_employer_clp: number;
   ley_sanna_clp: number;
   reforma_previsional_clp: number;
