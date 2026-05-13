@@ -167,3 +167,23 @@ class VacationRequest(SQLModel, table=True):
     ledger_entry_id: Optional[str] = Field(default=None, foreign_key="vacationledgerentry.id")
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+class CompanySettings(SQLModel, table=True):
+    """Singleton row holding company-level configuration.
+
+    Row id is fixed to 1; all reads/writes go through that key. Today this
+    only carries the economic activity (rubro) that determines the Mutual
+    cotización adicional rate, but it is the natural place to add future
+    company-wide settings (razón social, RUT, dirección, etc.).
+    """
+
+    id: int = Field(default=1, primary_key=True)
+    # FK-like reference to a code in 2026.json `mutual.economic_activities`.
+    # When the value is "otro" the override below applies.
+    economic_activity_code: Optional[str] = None
+    # Optional manual override for the cotización adicional rate (decimal,
+    # e.g. 0.017 for 1.70%). Used when the curated table does not cover the
+    # specific case. Mutually exclusive with the catalog code.
+    mutual_additional_rate_override: Optional[Decimal] = None
+    updated_at: datetime = Field(default_factory=utcnow)

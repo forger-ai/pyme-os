@@ -42,6 +42,7 @@ from app.payroll_engine import (
     PayrollInput,
     compute_from_base,
 )
+from app.routers.settings import resolve_mutual_additional_rate
 
 router = APIRouter()
 
@@ -115,6 +116,7 @@ class EmployerCostBreakdown(BaseModel):
     non_imponible_total_clp: float
     sis_clp: float
     mutual_clp: float
+    mutual_rate: float
     afc_employer_clp: float
     ley_sanna_clp: float
     reforma_previsional_clp: float
@@ -757,6 +759,7 @@ def _compute_employer_cost(
         health_provider=health_kind,
         isapre_plan_uf=plan_uf,
         non_imponible_items=items,
+        mutual_additional_rate=resolve_mutual_additional_rate(),
     )
     breakdown = compute_from_base(payroll_input)
     return EmployerCostBreakdown(
@@ -766,6 +769,7 @@ def _compute_employer_cost(
         non_imponible_total_clp=breakdown.non_imponible_total_clp,
         sis_clp=breakdown.sis_clp,
         mutual_clp=breakdown.mutual_clp,
+        mutual_rate=breakdown.mutual_rate,
         afc_employer_clp=breakdown.afc_employer_clp,
         ley_sanna_clp=breakdown.ley_sanna_clp,
         reforma_previsional_clp=breakdown.reforma_previsional_clp,

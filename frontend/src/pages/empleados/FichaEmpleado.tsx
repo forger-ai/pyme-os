@@ -462,7 +462,10 @@ function CostoEmpresaCard({ detail }: { detail: EmployeeDetail }) {
     {
       label: "Mutual de Seguridad",
       value: cost.mutual_clp,
-      note: "Tasa base 0,93% (varía por actividad)",
+      note:
+        cost.mutual_rate > 0.0093
+          ? `${(cost.mutual_rate * 100).toFixed(2)}% (rubro empresa)`
+          : `${(cost.mutual_rate * 100).toFixed(2)}% (base — configura rubro en Previred)`,
     },
     {
       label: "AFC empleador",

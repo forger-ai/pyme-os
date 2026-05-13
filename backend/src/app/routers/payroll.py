@@ -39,6 +39,7 @@ from app.payroll_engine import (
     compute_from_base,
     solve_for_anchor,
 )
+from app.routers.settings import resolve_mutual_additional_rate
 
 router = APIRouter()
 
@@ -165,6 +166,7 @@ class PreviewResponse(BaseModel):
 
     sis_clp: float
     mutual_clp: float
+    mutual_rate: float
     afc_employer_clp: float
     ley_sanna_clp: float
     reforma_previsional_clp: float
@@ -204,6 +206,7 @@ def preview(payload: PreviewRequest) -> PreviewResponse:
         imponible_extras=imp_extras,
         post_tax_discounts=post_tax,
         days_worked=payload.days_worked,
+        mutual_additional_rate=resolve_mutual_additional_rate(payload.year),
     )
     breakdown = solve_for_anchor(payload.anchor, payload.target_amount_clp, template)
     data = asdict(breakdown)
@@ -240,6 +243,7 @@ class PayslipInputs(BaseModel):
     imponible_extras: list[ItemDTO] = []
     post_tax_discounts: list[ItemDTO] = []
     days_worked: int = 30
+    mutual_additional_rate: float = 0.0
 
 
 class PayslipBreakdown(BaseModel):
@@ -365,6 +369,7 @@ def _build_inputs_from_contract(
 
     days = _days_worked_for_period(employee, period) if period else 30
 
+    period_year = period.constants_year if period else 2026
     return {
         "base_salary_clp": float(contract.base_salary_clp),
         "contract_type": (
@@ -375,7 +380,7 @@ def _build_inputs_from_contract(
         "afp_code": employee.afp_code or "habitat",
         "health_provider": health if health in ("fonasa", "isapre") else "fonasa",
         "isapre_plan_uf": 0.0,
-        "year": period.constants_year if period else 2026,
+        "year": period_year,
         "uf_value_clp": 40146.82,
         "utm_value_clp": 70588.0,
         "days_worked": days,
@@ -383,6 +388,9 @@ def _build_inputs_from_contract(
         "non_imponible_items": items_raw,
         "imponible_extras": [],
         "post_tax_discounts": [],
+        # Snapshot the Mutual cotización adicional rate at generation time so
+        # the payslip is reproducible even if company settings change later.
+        "mutual_additional_rate": resolve_mutual_additional_rate(period_year),
     }
 
 
@@ -413,6 +421,7 @@ def _inputs_dict_to_payroll(inputs: dict) -> PayrollInput:
             if isinstance(it, dict)
         ),
         days_worked=int(inputs.get("days_worked", 30)),
+        mutual_additional_rate=float(inputs.get("mutual_additional_rate", 0.0)),
     )
 
 
