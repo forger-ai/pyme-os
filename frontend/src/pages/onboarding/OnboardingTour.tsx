@@ -35,8 +35,19 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/CloseOutlined";
+import OpenInNewIcon from "@mui/icons-material/OpenInNewOutlined";
 import { ApiError, get, request } from "../../api/client";
 import Spotlight from "./Spotlight";
+
+const FORGER_PROMPT = "Quita la columna División de la tabla de Colaboradores.";
+// Forger Desktop registers the `forger://` URL scheme and routes
+// `forger://chat` URLs to its main window, focusing the chat scoped to
+// the named app and prefilling the composer. `app=pyme-os` matches the
+// manifest name; Desktop resolves it to `pyme-os-dev` when running the
+// dev install.
+const FORGER_CHAT_URL = `forger://chat?app=pyme-os&prompt=${encodeURIComponent(
+  FORGER_PROMPT
+)}`;
 
 type EmployeesPage = { items: unknown[]; total: number };
 type OnboardingState = { completed: boolean; completed_at: string | null };
@@ -148,32 +159,44 @@ export default function OnboardingTour({ onRequestTab }: Props) {
 
       <FloatingCard
         visible={step === "first_modification"}
-        title="Paso 2 de 2 · Personaliza PymeOS con Forger"
+        title="Paso 2 de 2 · Personaliza tu tabla"
         progress={50}
         onSkip={skip}
       >
         <Typography variant="body2" sx={{ mb: 1 }}>
-          PymeOS es tuyo: puedes pedirle a Forger que la modifique para que
-          se ajuste a tu pyme. Probemos con un cambio chico.
+          PymeOS es tuyo: pídele a Forger que la modifique para que se
+          ajuste a tu pyme. Probemos sacando una columna que no usas de
+          la tabla de Colaboradores.
         </Typography>
         <Paper
           variant="outlined"
           sx={{ p: 1.5, mb: 1.5, bgcolor: "background.default" }}
         >
           <Typography variant="caption" color="text.secondary">
-            Abre el chat de Forger (panel lateral de la ventana) y escribe:
+            Mensaje que enviaremos a Forger:
           </Typography>
           <Typography variant="body2" fontWeight={600} sx={{ mt: 0.5 }}>
-            "Quita la columna <em>División</em> de la tabla de Colaboradores."
+            "{FORGER_PROMPT}"
           </Typography>
         </Paper>
         <Typography variant="caption" color="text.secondary">
-          Forger creará una versión modificada de tu PymeOS con ese cambio.
-          Cuando termine, vuelve aquí y marca "Listo".
+          El botón abre el chat de Forger con el mensaje ya escrito —
+          solo lo revisas y lo envías. Cuando Forger termine el cambio,
+          vuelve aquí y marca "Listo".
         </Typography>
-        <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
-          <Button variant="contained" size="small" onClick={finish} fullWidth>
-            Listo
+        <Stack spacing={1} sx={{ mt: 1.5 }}>
+          <Button
+            component="a"
+            href={FORGER_CHAT_URL}
+            variant="contained"
+            size="small"
+            startIcon={<OpenInNewIcon />}
+            fullWidth
+          >
+            Abrir chat de Forger
+          </Button>
+          <Button variant="text" size="small" onClick={finish} fullWidth>
+            Listo, ya hice el cambio
           </Button>
         </Stack>
       </FloatingCard>
