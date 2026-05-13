@@ -5,6 +5,7 @@ description = "PymeOS backend: payroll and HR for Chilean SMBs"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115",
+    "httpx>=0.27",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "sqlmodel>=0.0.22",

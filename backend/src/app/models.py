@@ -187,3 +187,19 @@ class CompanySettings(SQLModel, table=True):
     # specific case. Mutually exclusive with the catalog code.
     mutual_additional_rate_override: Optional[Decimal] = None
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+class IndicatorSnapshot(SQLModel, table=True):
+    """Latest known value for a financial indicator (UF, UTM, ...).
+
+    Single row per indicator code (`uf`, `utm`). Refreshed on demand from
+    mindicador.cl via `/api/payroll/refresh-rates`. The engine reads from
+    here so payroll runs use the rate the user explicitly fetched, not a
+    snapshot frozen in the JSON constants file.
+    """
+
+    code: str = Field(primary_key=True)
+    value_clp: Decimal
+    snapshot_date: date
+    source: str = Field(default="mindicador.cl")
+    fetched_at: datetime = Field(default_factory=utcnow)
