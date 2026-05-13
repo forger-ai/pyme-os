@@ -203,3 +203,17 @@ class IndicatorSnapshot(SQLModel, table=True):
     snapshot_date: date
     source: str = Field(default="mindicador.cl")
     fetched_at: datetime = Field(default_factory=utcnow)
+
+
+class OnboardingFlag(SQLModel, table=True):
+    """Whether the first-run walkthrough has been completed.
+
+    Kept in its own table (singleton id=1) instead of inside CompanySettings
+    so the absence of a CompanySettings row does not implicitly skip the
+    tour. The tour writes this once when the user finishes or dismisses it.
+    """
+
+    id: int = Field(default=1, primary_key=True)
+    completed: bool = Field(default=False)
+    completed_at: Optional[datetime] = None
+    updated_at: datetime = Field(default_factory=utcnow)
