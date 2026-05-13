@@ -37,6 +37,11 @@ from app.models import (
     VacationKind,
     VacationLedgerEntry,
 )
+from app.payroll_engine import (
+    NonImponibleItem as PayrollNonImponibleItem,
+    PayrollInput,
+    compute_from_base,
+)
 
 router = APIRouter()
 
@@ -95,6 +100,32 @@ class VacationSummary(BaseModel):
     )
 
 
+class EmployerCostBreakdown(BaseModel):
+    """Monthly employer cost breakdown from the payroll engine.
+
+    All amounts in CLP. The breakdown applies the imponible cap (90 UF),
+    legal gratification (capped at 4.75 IMM / 12), AFC employer rate by
+    contract type, and the SIS / Mutual / SANNA / Reforma previsional
+    rates from the year's constants file.
+    """
+
+    base_salary_clp: float
+    gratification_clp: float
+    imponible_clp: float
+    non_imponible_total_clp: float
+    sis_clp: float
+    mutual_clp: float
+    afc_employer_clp: float
+    ley_sanna_clp: float
+    reforma_previsional_clp: float
+    total_employer_extras_clp: float
+    total_employer_cost_clp: float
+    contract_type: ContractType
+    year: int
+    uf_value_clp: float
+    notes: list[str] = []
+
+
 class EmployeeDetail(BaseModel):
     id: str
     rut: str
@@ -120,6 +151,7 @@ class EmployeeDetail(BaseModel):
     direct_reports_count: int
     current_contract: Optional[CurrentContractInfo]
     vacation_summary: VacationSummary
+    employer_cost: Optional[EmployerCostBreakdown] = None
 
 
 class PayslipRow(BaseModel):
@@ -648,6 +680,7 @@ def _build_detail(session: Session, employee: Employee) -> EmployeeDetail:
     )
 
     current_contract_info = None
+    employer_cost: Optional[EmployerCostBreakdown] = None
     if contract:
         items_raw = _parse_non_imponibles(contract.non_imponible_items_json)
         current_contract_info = CurrentContractInfo(
@@ -662,6 +695,7 @@ def _build_detail(session: Session, employee: Employee) -> EmployeeDetail:
                 NonImponibleItemOut(**it) for it in items_raw
             ],
         )
+        employer_cost = _compute_employer_cost(employee, contract, items_raw)
 
     return EmployeeDetail(
         id=employee.id,
@@ -688,6 +722,59 @@ def _build_detail(session: Session, employee: Employee) -> EmployeeDetail:
         direct_reports_count=int(direct_reports_value),
         current_contract=current_contract_info,
         vacation_summary=_vacation_summary(session, employee.id),
+        employer_cost=employer_cost,
+    )
+
+
+def _compute_employer_cost(
+    employee: Employee,
+    contract: Contract,
+    non_imponibles_raw: list[dict],
+) -> Optional[EmployerCostBreakdown]:
+    """Run the payroll engine for the employee's current contract.
+
+    Returns None when the contract has no positive base salary, since the
+    engine requires a positive imponible. The UF/UTM values fall back to
+    the PayrollInput defaults (mayo 2026 snapshot); for period-accurate
+    calculations the wizard / period flow can override them.
+    """
+    base = float(contract.base_salary_clp)
+    if base <= 0:
+        return None
+    health_kind = (
+        "isapre" if employee.health_provider == HealthProvider.isapre else "fonasa"
+    )
+    plan_uf = float(employee.health_plan_uf) if employee.health_plan_uf else 0.0
+    items = tuple(
+        PayrollNonImponibleItem(label=str(it["label"]), amount_clp=float(it["amount_clp"]))
+        for it in non_imponibles_raw
+        if it.get("label") and float(it.get("amount_clp") or 0) > 0
+    )
+    payroll_input = PayrollInput(
+        base_salary_clp=base,
+        contract_type=contract.contract_type.value,
+        afp_code=employee.afp_code or "habitat",
+        health_provider=health_kind,
+        isapre_plan_uf=plan_uf,
+        non_imponible_items=items,
+    )
+    breakdown = compute_from_base(payroll_input)
+    return EmployerCostBreakdown(
+        base_salary_clp=breakdown.base_salary_clp,
+        gratification_clp=breakdown.gratification_clp,
+        imponible_clp=breakdown.imponible_clp,
+        non_imponible_total_clp=breakdown.non_imponible_total_clp,
+        sis_clp=breakdown.sis_clp,
+        mutual_clp=breakdown.mutual_clp,
+        afc_employer_clp=breakdown.afc_employer_clp,
+        ley_sanna_clp=breakdown.ley_sanna_clp,
+        reforma_previsional_clp=breakdown.reforma_previsional_clp,
+        total_employer_extras_clp=breakdown.total_employer_extras_clp,
+        total_employer_cost_clp=breakdown.total_employer_cost_clp,
+        contract_type=contract.contract_type,
+        year=breakdown.year,
+        uf_value_clp=breakdown.uf_value_clp,
+        notes=list(breakdown.notes),
     )
 
 

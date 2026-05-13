@@ -392,73 +392,97 @@ function ResumenTab({ detail }: { detail: EmployeeDetail }) {
 // ── Costo Empresa ────────────────────────────────────────────────────────────
 
 /**
- * Estimacion del costo total mensual del colaborador para la empresa.
+ * Costo total mensual del colaborador para la empresa.
  *
- * Importante: estos porcentajes son una aproximacion. El motor de calculo
- * real (con SIS por edad/genero, Mutual por tasa real, AFC empleador,
- * gratificacion legal topada, etc.) no esta implementado en esta version.
- * El usuario puede sobrescribir cualquier rubro cuando construyamos el
- * editor de remuneracion.
+ * La breakdown viene del motor de cálculo del backend (`payroll_engine`),
+ * que aplica tope imponible (90 UF), gratificación legal topada
+ * (4,75 IMM / 12), AFC empleador según tipo de contrato y las tasas
+ * SIS / Mutual base / Ley SANNA / Reforma previsional del JSON de
+ * constantes del año vigente.
  */
-const EMPLOYER_COST_RATES = {
-  sis: 0.0188, // Seguro de Invalidez y Sobrevivencia (referencial)
-  mutual: 0.0093, // Mutual base (referencial, varia por actividad)
-  afc_empleador: 0.024, // AFC empleador para indefinidos
-  ley_sanna: 0.003,
-  reforma_previsional: 0.01,
-} as const;
-
 function CostoEmpresaCard({ detail }: { detail: EmployeeDetail }) {
-  const baseSalary = detail.current_contract?.base_salary_clp ?? 0;
-  if (baseSalary === 0) {
+  if (!detail.current_contract) {
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} gutterBottom>
           Costo Empresa
         </Typography>
         <Alert severity="info">
-          Sin contrato vigente, no se puede estimar el costo empresa.
+          Sin contrato vigente, no se puede calcular el costo empresa.
         </Alert>
       </Paper>
     );
   }
 
-  const isIndefinite = detail.current_contract?.contract_type === "indefinite";
+  const cost = detail.employer_cost;
+  if (!cost) {
+    return (
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+          Costo Empresa
+        </Typography>
+        <Alert severity="warning">
+          No se pudo calcular el costo empresa para este contrato.
+        </Alert>
+      </Paper>
+    );
+  }
+
+  const contractTypeLabel: Record<string, string> = {
+    indefinite: "indefinido",
+    fixed_term: "plazo fijo",
+    project_based: "por obra",
+    part_time: "part-time",
+  };
+
   const items = [
-    { label: "Sueldo bruto contractual", value: baseSalary },
+    { label: "Sueldo base contractual", value: cost.base_salary_clp },
+    ...(cost.gratification_clp > 0
+      ? [
+          {
+            label: "Gratificación legal",
+            value: cost.gratification_clp,
+            note: "Tope 4,75 IMM / 12",
+          },
+        ]
+      : []),
+    ...(cost.non_imponible_total_clp > 0
+      ? [
+          {
+            label: "Haberes no imponibles",
+            value: cost.non_imponible_total_clp,
+          },
+        ]
+      : []),
     {
       label: "SIS (Seguro Invalidez y Sobrevivencia)",
-      value: baseSalary * EMPLOYER_COST_RATES.sis,
-      note: `${(EMPLOYER_COST_RATES.sis * 100).toFixed(2)}%`,
+      value: cost.sis_clp,
+      note: "Sobre imponible topado a 90 UF",
     },
     {
-      label: "Mutual de Seguridad (base)",
-      value: baseSalary * EMPLOYER_COST_RATES.mutual,
-      note: `${(EMPLOYER_COST_RATES.mutual * 100).toFixed(2)}%`,
+      label: "Mutual de Seguridad",
+      value: cost.mutual_clp,
+      note: "Tasa base 0,93% (varía por actividad)",
     },
     {
       label: "AFC empleador",
-      value: isIndefinite ? baseSalary * EMPLOYER_COST_RATES.afc_empleador : 0,
-      note: isIndefinite
-        ? `${(EMPLOYER_COST_RATES.afc_empleador * 100).toFixed(2)}% (indefinido)`
-        : "0% (no aplica)",
+      value: cost.afc_employer_clp,
+      note: `Contrato ${contractTypeLabel[cost.contract_type] ?? cost.contract_type}`,
     },
     {
       label: "Ley SANNA",
-      value: baseSalary * EMPLOYER_COST_RATES.ley_sanna,
-      note: `${(EMPLOYER_COST_RATES.ley_sanna * 100).toFixed(2)}%`,
+      value: cost.ley_sanna_clp,
     },
     {
       label: "Reforma previsional (cargo empleador)",
-      value: baseSalary * EMPLOYER_COST_RATES.reforma_previsional,
-      note: `${(EMPLOYER_COST_RATES.reforma_previsional * 100).toFixed(2)}%`,
+      value: cost.reforma_previsional_clp,
     },
   ];
-  const totalEmployerExtras = items
-    .slice(1)
-    .reduce((acc, it) => acc + it.value, 0);
-  const totalCost = baseSalary + totalEmployerExtras;
-  const overheadPct = baseSalary > 0 ? (totalEmployerExtras / baseSalary) * 100 : 0;
+
+  const overheadPct =
+    cost.base_salary_clp > 0
+      ? (cost.total_employer_extras_clp / cost.base_salary_clp) * 100
+      : 0;
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -471,13 +495,12 @@ function CostoEmpresaCard({ detail }: { detail: EmployeeDetail }) {
         <Typography variant="subtitle1" fontWeight={700}>
           Costo Empresa
         </Typography>
-        <Chip label="Estimado" size="small" variant="outlined" color="warning" />
+        <Chip
+          label={`UF ${cost.uf_value_clp.toLocaleString("es-CL")} · ${cost.year}`}
+          size="small"
+          variant="outlined"
+        />
       </Stack>
-      <Alert severity="info" sx={{ mb: 2 }}>
-        Estimación con tasas referenciales. El motor de cálculo real (SIS por
-        edad/género, Mutual por actividad, gratificación legal topada, etc.)
-        aún no está implementado.
-      </Alert>
 
       <Table size="small">
         <TableBody>
@@ -511,14 +534,14 @@ function CostoEmpresaCard({ detail }: { detail: EmployeeDetail }) {
       >
         <Stack>
           <Typography variant="subtitle2" fontWeight={700}>
-            Costo total estimado
+            Costo total mensual
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Overhead sobre bruto: +{overheadPct.toFixed(1)}%
+            Overhead sobre base: +{overheadPct.toFixed(1)}%
           </Typography>
         </Stack>
         <Typography variant="h6" fontWeight={700} color="primary.main">
-          {formatCLP(totalCost)}
+          {formatCLP(cost.total_employer_cost_clp)}
         </Typography>
       </Stack>
     </Paper>
