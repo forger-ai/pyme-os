@@ -52,6 +52,24 @@ export type VacationSummary = {
   note: string;
 };
 
+export type EmployerCostBreakdown = {
+  base_salary_clp: number;
+  gratification_clp: number;
+  imponible_clp: number;
+  non_imponible_total_clp: number;
+  sis_clp: number;
+  mutual_clp: number;
+  afc_employer_clp: number;
+  ley_sanna_clp: number;
+  reforma_previsional_clp: number;
+  total_employer_extras_clp: number;
+  total_employer_cost_clp: number;
+  contract_type: ContractType;
+  year: number;
+  uf_value_clp: number;
+  notes: string[];
+};
+
 export type EmployeeDetail = {
   id: string;
   rut: string;
@@ -77,6 +95,7 @@ export type EmployeeDetail = {
   direct_reports_count: number;
   current_contract: CurrentContractInfo | null;
   vacation_summary: VacationSummary;
+  employer_cost: EmployerCostBreakdown | null;
 };
 
 export type PayslipRow = {
