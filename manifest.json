@@ -1,8 +1,16 @@
 {
   "name": "pyme-os",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Local-first payroll and HR app for Chilean SMBs (Pymes). FastAPI backend, Vite + React frontend, SQLite storage.",
   "changelog": [
+    {
+      "version": "0.1.3",
+      "summary": "Updates shared stack runtime support and agent guidance.",
+      "changes": [
+        "Updates the shared stack commons reference used by PymeOS.",
+        "Includes Claude guidance that points agents back to the app's AGENTS.md contract."
+      ]
+    },
     {
       "version": "0.1.2",
       "summary": "Adds employee, org chart, payroll, vacation, and app icon updates.",
