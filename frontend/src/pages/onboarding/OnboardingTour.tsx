@@ -36,7 +36,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/CloseOutlined";
 import OpenInNewIcon from "@mui/icons-material/OpenInNewOutlined";
-import { ApiError, get, request } from "../../api/client";
+import { get, request } from "../../api/client";
 import Spotlight from "./Spotlight";
 
 const FORGER_PROMPT = "Quita la columna División de la tabla de Colaboradores.";

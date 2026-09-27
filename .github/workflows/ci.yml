@@ -21,6 +21,7 @@ jobs:
         run: |
           docker compose run --rm backend uv run --extra dev ruff check src/app/mcp_runtime.py src/app/mcp_server.py
           docker compose run --rm backend uv run python -m py_compile src/app/mcp_runtime.py src/app/mcp_server.py
+          docker compose run --rm backend uv run --extra dev pytest tests/test_onboarding.py
 
       - name: Frontend build
         run: docker compose run --rm --no-deps frontend npm run build
