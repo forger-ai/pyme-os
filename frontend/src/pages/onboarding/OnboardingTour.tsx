@@ -35,7 +35,7 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/CloseOutlined";
-import { ApiError, get, request } from "../../api/client";
+import { get, request } from "../../api/client";
 import Spotlight from "./Spotlight";
 
 type EmployeesPage = { items: unknown[]; total: number };
