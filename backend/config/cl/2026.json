@@ -59,7 +59,31 @@
       { "code": "mutual",  "name": "Mutual de Seguridad CChC",          "previred_code": "02" },
       { "code": "ist",     "name": "IST (Instituto Seguridad Trabajo)", "previred_code": "03" }
     ],
-    "default_code": "achs"
+    "default_code": "achs",
+    "additional_rate_tiers": [0.0, 0.0085, 0.017, 0.0255, 0.034],
+    "additional_rate_source": "Decreto Supremo N° 110 de 1968 (modificado por D.S. 67/1999), Ministerio del Trabajo y Previsión Social. Cotización adicional diferenciada por actividad económica, aplicada sobre el imponible.",
+    "economic_activities": [
+      { "code": "servicios_profesionales",  "name": "Servicios profesionales y oficina",        "additional_rate": 0.0,    "ciiu_section": "K, M",     "examples": "Consultoría, contabilidad, abogados, marketing, arquitectura" },
+      { "code": "software_ti",              "name": "Software y servicios TI",                  "additional_rate": 0.0,    "ciiu_section": "J",        "examples": "Desarrollo de software, soporte TI, SaaS" },
+      { "code": "educacion",                "name": "Educación",                                "additional_rate": 0.0,    "ciiu_section": "M",        "examples": "Colegios, jardines infantiles, capacitación" },
+      { "code": "servicios_financieros",    "name": "Servicios financieros y seguros",          "additional_rate": 0.0,    "ciiu_section": "K",        "examples": "Corredoras, asesorías financieras, fintech sin desarrollo industrial" },
+      { "code": "inmobiliaria",             "name": "Inmobiliarias y arriendos",                "additional_rate": 0.0085, "ciiu_section": "L",        "examples": "Corretaje, administración de propiedades" },
+      { "code": "comercio_menor",           "name": "Comercio al por menor",                    "additional_rate": 0.0085, "ciiu_section": "G",        "examples": "Tiendas, minimarkets, e-commerce, retail" },
+      { "code": "comercio_mayor",           "name": "Comercio al por mayor",                    "additional_rate": 0.0085, "ciiu_section": "G",        "examples": "Distribuidoras, mayoristas, importadores" },
+      { "code": "gastronomia",              "name": "Hoteles, restaurantes y cafés",            "additional_rate": 0.0085, "ciiu_section": "I",        "examples": "Restaurantes, cafeterías, hoteles boutique, delivery" },
+      { "code": "salud_ambulatoria",        "name": "Salud ambulatoria",                        "additional_rate": 0.0085, "ciiu_section": "N",        "examples": "Consultas médicas, dental, kinesiología, laboratorios" },
+      { "code": "manufactura_liviana",      "name": "Manufactura liviana (alimentos, textil)",  "additional_rate": 0.017,  "ciiu_section": "D",        "examples": "Panaderías, repostería, confección, artesanía" },
+      { "code": "transporte_pasajeros",     "name": "Transporte de pasajeros",                  "additional_rate": 0.017,  "ciiu_section": "I",        "examples": "Taxis, transfers, escolares, turismo" },
+      { "code": "talleres_automotriz",      "name": "Talleres mecánicos y automotriz",          "additional_rate": 0.017,  "ciiu_section": "G",        "examples": "Servitecas, talleres mecánicos, lavadoras" },
+      { "code": "agricultura",              "name": "Agricultura y ganadería menor",            "additional_rate": 0.017,  "ciiu_section": "A",        "examples": "Hortalizas, frutales, viñas pequeñas, avicultura" },
+      { "code": "imprenta_editorial",       "name": "Imprenta, editorial y publicidad gráfica", "additional_rate": 0.017,  "ciiu_section": "D",        "examples": "Imprentas, gráficas, serigrafía" },
+      { "code": "construccion_liviana",     "name": "Construcción liviana y remodelación",      "additional_rate": 0.0255, "ciiu_section": "F",        "examples": "Refacciones, terminaciones, pintura, gasfitería" },
+      { "code": "metalmecanica",            "name": "Metalmecánica y manufactura mediana",      "additional_rate": 0.0255, "ciiu_section": "D",        "examples": "Estructuras metálicas, maestranza, mantención industrial" },
+      { "code": "transporte_carga",         "name": "Transporte de carga",                      "additional_rate": 0.0255, "ciiu_section": "I",        "examples": "Camiones, fletes, logística" },
+      { "code": "construccion_pesada",      "name": "Construcción pesada y obra mayor",         "additional_rate": 0.034,  "ciiu_section": "F",        "examples": "Obra gruesa, movimiento de tierra, infraestructura" },
+      { "code": "pesca",                    "name": "Pesca y acuicultura",                      "additional_rate": 0.034,  "ciiu_section": "B",        "examples": "Pesca artesanal, cultivos marinos" },
+      { "code": "mineria",                  "name": "Minería y canteras",                       "additional_rate": 0.034,  "ciiu_section": "C",        "examples": "Pirquineros, canteras, áridos" }
+    ]
   },
   "caja_compensacion": {
     "providers": [

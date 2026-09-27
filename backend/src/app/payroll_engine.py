@@ -82,6 +82,11 @@ class PayrollInput:
     # and non-imponible items proportionally. Extras (bonos) are NOT pro-rated
     # because they typically reflect a specific event in the period.
     days_worked: int = 30
+    # Cotización adicional diferenciada de Mutual (D.S. 110). Applied on top of
+    # `employer_extras.mutual_base`. The router resolves the rate from
+    # `CompanySettings.economic_activity_code` (or the manual override) and
+    # passes it in; the engine stays a pure function.
+    mutual_additional_rate: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -119,6 +124,7 @@ class PayrollBreakdown:
     # Costo empleador
     sis_clp: float
     mutual_clp: float
+    mutual_rate: float  # Effective Mutual rate: base + cotización adicional.
     afc_employer_clp: float
     ley_sanna_clp: float
     reforma_previsional_clp: float
@@ -226,7 +232,8 @@ def compute_from_base(input: PayrollInput) -> PayrollBreakdown:
     afc_employer = capped_afc * float(afc_emp_employer_rate)
     extras = {**EMPLOYER_EXTRA_RATES_FALLBACK, **constants.get("employer_extras", {})}
     sis = capped_health * float(extras["sis"])
-    mutual = imponible * float(extras["mutual_base"])
+    mutual_rate = float(extras["mutual_base"]) + max(0.0, float(input.mutual_additional_rate))
+    mutual = imponible * mutual_rate
     ley_sanna = capped_health * float(extras["ley_sanna"])
     reforma = capped_health * float(extras["reforma_previsional"])
 
@@ -273,6 +280,7 @@ def compute_from_base(input: PayrollInput) -> PayrollBreakdown:
         net_salary_clp=_round(net),
         sis_clp=_round(sis),
         mutual_clp=_round(mutual),
+        mutual_rate=mutual_rate,
         afc_employer_clp=_round(afc_employer),
         ley_sanna_clp=_round(ley_sanna),
         reforma_previsional_clp=_round(reforma),

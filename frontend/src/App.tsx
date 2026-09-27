@@ -16,6 +16,7 @@ import Organigrama from "./pages/organigrama/Organigrama";
 import LiquidacionesPage from "./pages/liquidaciones/LiquidacionesPage";
 import VacacionesPage from "./pages/vacaciones/VacacionesPage";
 import PreviredPage from "./pages/Previred";
+import OnboardingTour from "./pages/onboarding/OnboardingTour";
 
 type HealthStatus = "loading" | "ok" | "error";
 
@@ -80,6 +81,8 @@ export default function App() {
         {tab === "vacaciones" && <VacacionesPage />}
         {tab === "previred" && <PreviredPage />}
       </Container>
+
+      <OnboardingTour onRequestTab={(t) => setTab(t)} />
     </Box>
   );
 }

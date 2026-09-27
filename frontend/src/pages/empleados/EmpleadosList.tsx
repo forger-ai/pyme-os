@@ -195,6 +195,7 @@ export default function EmpleadosList({ onSelect }: Props) {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setShowCreate(true)}
+          data-tour-id="empleados-nuevo"
         >
           Nuevo colaborador
         </Button>
