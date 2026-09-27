@@ -45,6 +45,7 @@ jobs:
             'asset_name_template': asset_template,
             'expected_tag': tag_template.format(name=name, version=version),
             'asset_name': asset_template.format(name=name, version=version),
+            'publish_catalog': str(catalog.get('status') in ('beta', 'production')).lower(),
           }
 
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
@@ -108,6 +109,7 @@ jobs:
         run: gh release upload "$TAG" "tmp/dist/$ASSET_NAME" --clobber
 
       - name: Publish version to FORGER Cloud
+        if: steps.meta.outputs.publish_catalog == 'true'
         env:
           PUBLISH_URL: https://platform.forger.cloud/api/v1/publisher/app_versions
           PUBLISH_SECRET: ${{ secrets.FORGER_CATALOG_PUBLISH_SECRET }}
