@@ -1,8 +1,16 @@
 {
   "name": "pyme-os",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Local-first payroll and HR app for Chilean SMBs (Pymes). FastAPI backend, Vite + React frontend, SQLite storage.",
   "changelog": [
+    {
+      "version": "0.1.4",
+      "summary": "Guides new users through their first collaborator and customization in Forger.",
+      "changes": [
+        "Adds a first-run walkthrough with persistent completion and a direct link to the Forger chat.",
+        "Adds payroll period creation, on-demand UF and UTM refresh, and company contribution settings."
+      ]
+    },
     {
       "version": "0.1.3",
       "summary": "Updates shared stack runtime support and agent guidance.",
